@@ -3,149 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Just U & I 💖</title>
-  <link rel="manifest" href="manifest.json" />
+  <title>💌 Just Us</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1508264165352-258db2ebd59b?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background: url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
       background-size: cover;
-      color: white;
-      text-align: center;
-      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-    .overlay {
-      background: rgba(0, 0, 0, 0.6);
-      padding: 20px;
-      max-width: 600px;
-      margin: 40px auto;
-      border-radius: 20px;
-    }
-    textarea {
+
+    #container {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 1rem;
+      padding: 2rem;
       width: 90%;
-      height: 200px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: none;
+      max-width: 500px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      backdrop-filter: blur(5px);
     }
+
+    h1 {
+      text-align: center;
+      color: #be185d;
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 0.5rem;
+      resize: none;
+      font-size: 1rem;
+    }
+
     button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 10px;
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
       border: none;
+      border-radius: 6px;
+      background-color: #ec4899;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
     }
-    .hearts {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 999;
+
+    .msg {
+      background: #fff;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-left: 5px solid #ec4899;
+      border-radius: 6px;
     }
-    .heart {
-      position: absolute;
-      color: pink;
-      font-size: 24px;
-      animation: float 6s linear infinite;
+
+    .hidden {
+      display: none;
     }
-    @keyframes float {
-      0% { transform: translateY(100vh) rotate(0); opacity: 1; }
-      100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
-    }
-    #quote {
-      font-style: italic;
-      font-size: 18px;
-      margin-bottom: 10px;
+
+    input[type="password"] {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
-  <audio id="bg-music" loop autoplay>
-    <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
-  </audio>
-  <div class="hearts"></div>
+  <div id="container">
+    <h1>🔐 Just You & Me</h1>
 
-  <div class="overlay">
-    <h1>Just U & I 💖</h1>
-    <div id="quote"></div>
-    <input type="password" id="passcode" placeholder="Enter passcode" />
-    <button onclick="unlock()">Unlock</button>
-    <div id="main" style="display:none">
-      <textarea id="message" placeholder="Write your secret message..."></textarea><br>
-      <button onclick="saveMsg()">Save</button>
-      <button onclick="exportMsg()">Export</button>
-      <button onclick="importMsg()">Import</button>
-      <input type="file" id="fileInput" style="display:none" accept=".txt" />
+    <div id="login">
+      <p>Enter our secret code:</p>
+      <input type="password" id="secret" placeholder="Secret code..." />
+      <button onclick="unlock()">Enter</button>
     </div>
-    <button onclick="toggleMusic()">🔊 Toggle Music</button>
+
+    <div id="app" class="hidden">
+      <textarea id="note" placeholder="Type a secret love message..."></textarea>
+      <button onclick="send()">Send</button>
+      <div id="messages"></div>
+    </div>
   </div>
 
   <script>
-    const pass = "onlyus";
-    const quotes = [
-      "You are my today and all of my tomorrows. 💕",
-      "Together is a wonderful place to be.",
-      "Every love story is beautiful, but ours is my favorite.",
-      "You’re the one I’ve been waiting for."
-    ];
-    document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
+    const PASSCODE = "onlyus";
+    const storageKey = "secretMessages";
 
     function unlock() {
-      const code = document.getElementById("passcode").value;
-      if (code === pass) {
-        document.getElementById("main").style.display = "block";
-        const saved = localStorage.getItem("love-msg");
-        if (saved) document.getElementById("message").value = saved;
+      const input = document.getElementById("secret").value;
+      if (input === PASSCODE) {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+        loadMessages();
       } else {
-        alert("Wrong passcode 💔");
+        alert("Wrong secret 💔");
       }
     }
 
-    function saveMsg() {
-      const msg = document.getElementById("message").value;
-      localStorage.setItem("love-msg", msg);
-      alert("Saved with love 💖");
-    }
-
-    function exportMsg() {
-      const msg = document.getElementById("message").value;
-      const blob = new Blob([msg], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "just-u-and-i.txt";
-      a.click();
-    }
-
-    function importMsg() {
-      document.getElementById("fileInput").click();
-      document.getElementById("fileInput").onchange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          document.getElementById("message").value = event.target.result;
-        };
-        reader.readAsText(file);
+    function send() {
+      const text = document.getElementById("note").value.trim();
+      if (!text) return;
+      const msg = {
+        text,
+        time: new Date().toLocaleString(),
       };
+      const messages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      messages.unshift(msg);
+      localStorage.setItem(storageKey, JSON.stringify(messages));
+      document.getElementById("note").value = "";
+      loadMessages();
     }
 
-    function toggleMusic() {
-      const audio = document.getElementById("bg-music");
-      if (audio.paused) audio.play(); else audio.pause();
+    function loadMessages() {
+      const container = document.getElementById("messages");
+      const messages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      container.innerHTML = messages
+        .map(m => `<div class="msg"><p>${m.text}</p><small>${m.time}</small></div>`)
+        .join("");
     }
-
-    // Floating hearts animation
-    setInterval(() => {
-      const heart = document.createElement("div");
-      heart.className = "heart";
-      heart.innerText = "💗";
-      heart.style.left = Math.random() * 100 + "vw";
-      heart.style.fontSize = Math.random() * 20 + 10 + "px";
-      document.querySelector(".hearts").appendChild(heart);
-      setTimeout(() => heart.remove(), 6000);
-    }, 500);
   </script>
 </body>
 </html>
